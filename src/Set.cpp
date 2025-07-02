@@ -1,5 +1,6 @@
 #include "Set.h"
 #include <iostream>
+#include <vector>
 using namespace std;
 
 Set::Set(int size) {
@@ -22,13 +23,7 @@ bool Set::contains(int num) {
         if (nums[i] == num) return true;
     }
     return false;
-}
-
-int Set::intersect_len(Set other) {
-    int len = 0;
-    for (int i=0; i<cur_size; i++) len += other.contains(nums[i]) ? 1 : 0;
-    return len;
-}
+}        
 
 void Set::add(int num) {
     if (cur_size < size && !contains(num)) {
@@ -39,6 +34,25 @@ void Set::add(int num) {
 
 void Set::addAll(int toadd[], int toadd_size) {
     for (int i=0; i<toadd_size; i++) add(toadd[i]);
+}
+
+void Set::addAll(vector<int> values) {
+    for (int num: values) add(num);
+}
+
+
+Set Set::operator&(Set other) {
+    vector<int> res;
+    int len = 0;
+    for (int i=0; i<cur_size; i++) {
+        if (other.contains(nums[i])) {
+            len++;
+            res.push_back(nums[i]);
+        }
+    }        
+    Set new_set(len);
+    new_set.addAll(res);
+    return new_set;
 }
 
 void Set::remove(int num) {
@@ -65,19 +79,26 @@ void Set::removeAll(int toremove[], int toremove_size) {
 }
 
 Set Set::operator+(Set other) {
-    Set res(cur_size + other.cur_size - intersect_len(other));
+    Set res(cur_size + other.cur_size - (*this & other).size);
     res.addAll(nums, cur_size);
     res.addAll(other.nums, other.cur_size);
     return res;
 }
 
 Set Set::operator-(Set other) {
-    Set res(cur_size - intersect_len(other));
+    Set intersect = *this & other;
+    Set res(cur_size - intersect.size);
     for (int i=0; i<cur_size; i++) {
-        if (!other.contains(nums[i])) res.add(nums[i]);
+        if (!intersect.contains(nums[i])) res.add(nums[i]);
     }
     return res;
 }
+
+bool Set::operator>(Set other) { 
+    int intersection = (*this & other).size;
+    return size >= intersection && other.size == intersection;
+}
+bool Set::operator<(Set other) { return size == (*this & other).size; }
 
 void Set::print() {
     cout << "{ ";
