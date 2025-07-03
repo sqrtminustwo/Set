@@ -1,22 +1,29 @@
 #ifndef SET_H
 #define SET_H
 #include <vector>
+#include <optional>
+using namespace std;
+
+class Hash {
+    public:
+    int index;
+    bool contains;
+};
 
 class Set {
 private:
     int size;
     int cur_size;
-    int *nums;
-    bool contains(int num);
+    vector<optional<int>> nums;
+    Hash hash(int num);
 public:
-    Set(int size);
-    Set::Set(const Set &other);
-    ~Set();
+    Set(int nums_size);
+    Set(const Set &other);
+    bool contains(int num);
     void add(int num);
-    void addAll(int toadd[], int toadd_size);
-    void addAll(std::vector<int> values);
+    void addAll(vector<int> values);
     void remove(int num);
-    void removeAll(int toremove[], int toremove_size);
+    void removeAll(vector<int> values);
     Set operator+(Set other);
     Set operator-(Set other);
     Set operator&(Set other);
@@ -24,5 +31,6 @@ public:
     bool operator<(Set other);
     void print();
 };
+
 
 #endif
