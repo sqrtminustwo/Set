@@ -4,8 +4,7 @@
 #include <optional>
 using namespace std;
 
-class Hash {
-    public:
+struct Hash {
     int index;
     bool contains;
 };
@@ -30,6 +29,7 @@ public:
     bool operator>(Set other);
     bool operator<(Set other);
     void print();
+    void actual_print();
 };
 
 

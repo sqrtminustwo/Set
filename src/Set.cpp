@@ -9,15 +9,20 @@ Set::Set(int nums_size) {
     cur_size = 0;
 }
 Set::Set(const Set& other) {
-    nums.assign(other.nums.begin(), other.nums.end());
+    size = other.size;
+    cur_size = other.cur_size;
+    nums = other.nums;
 }
 
 Hash Set::hash(int num) {
     Hash h;
     h.contains = false;
     int i = 0;
+    vector<int> seen;
     do {
-        h.index = (num + i*i) % size;
+        h.index = (num + i) % size;
+        for (int num: seen) if (num == h.index) return h;
+        seen.push_back(h.index);
         if (nums.at(h.index).has_value() && nums.at(h.index).value() == num) {
             h.contains = true;
             return h;
@@ -27,18 +32,17 @@ Hash Set::hash(int num) {
     return h;
 }
 
-bool Set::contains(int num) { return hash(num).contains; }
+bool Set::contains(int num) { 
+    if (size < 1) return false;
+    return hash(num).contains;
+ }
 
 void Set::add(int num) {
-    //cout << "cur_size: " << cur_size << " size: " << size << "\n";
     if (cur_size >= size) return;
-    //cout << "before hash\n";
     Hash h = hash(num);
-    //cout << "trying adding " << num << " index = " << h.index << " contains = " << h.contains << "\n";
     if (h.contains) return;
     cur_size++;
-    //cout << "added" << "\n\n";
-    nums.insert(nums.begin() + h.index, optional<int>(num));
+    nums[h.index] = num;
 }
 
 void Set::addAll(vector<int> values) {
@@ -49,7 +53,7 @@ void Set::addAll(vector<int> values) {
 void Set::remove(int num) {
     Hash h = hash(num);
     if (!h.contains) return;
-    nums.erase(nums.begin() + h.index);
+    nums[h.index].reset();
     cur_size--;
 }
 
@@ -59,10 +63,11 @@ void Set::removeAll(vector<int> values) {
 
 Set Set::operator&(Set other) {
     vector<int> res;
+    Set min = cur_size < other.cur_size ? *this : other;
+    Set max = cur_size < other.cur_size ? other : *this;
     int len = 0;
-    for (int i=0; i<size; i++) {
-        optional<int> num = nums[i];
-        if (num.has_value() && contains(num.value())) {
+    for (optional<int> num: min.nums) {
+        if (num.has_value() && max.contains(num.value())) {
             len++;
             res.push_back(num.value());
         }
@@ -72,31 +77,42 @@ Set Set::operator&(Set other) {
     return new_set;
 }
 
-// Set Set::operator+(Set other) {
-//     Set res(cur_size + other.cur_size - (*this & other).size);
-//     res.addAll(nums, cur_size);
-//     res.addAll(other.nums, other.cur_size);
-//     return res;
-// }
+Set Set::operator+(Set other) {
+    Set res(cur_size + other.cur_size - (*this & other).size);
+    for (optional<int> num: nums) if (num.has_value()) res.add(num.value());
+    for (optional<int> num: other.nums) if (num.has_value()) res.add(num.value());
+    return res;
+}
 
-// Set Set::operator-(Set other) {
-//     Set intersect = *this & other;
-//     Set res(cur_size - intersect.size);
-//     for (int i=0; i<cur_size; i++) {
-//         if (!intersect.contains(nums[i])) res.add(nums[i]);
-//     }
-//     return res;
-// }
+Set Set::operator-(Set other) {
+    Set intersect = *this & other;
+    Set res(cur_size - intersect.size);
 
-// bool Set::operator>(Set other) { 
-//     int intersection = (*this & other).size;
-//     return size >= intersection && other.size == intersection;
-// }
-// bool Set::operator<(Set other) { return size == (*this & other).size; }
+    for (optional<int> num: nums) {
+        if (num.has_value() && !intersect.contains(num.value())) {
+            res.add(num.value());
+        }
+    }    
+    return res;
+}
+
+bool Set::operator>(Set other) { 
+    int intersection = (*this & other).cur_size;
+    return cur_size >= intersection && other.cur_size == intersection;
+}
+bool Set::operator<(Set other) { return cur_size == (*this & other).cur_size; }
 
 void Set::print() {
     cout << "{ ";
-    for (int i=0; i<nums.size(); i++) 
-        if(nums.at(i).has_value()) cout << nums.at(i).value() << " "; 
+    for (optional<int> num: nums) 
+        if(num.has_value()) cout << num.value() << " "; 
+    cout << "}\n";
+}
+
+void Set::actual_print() {
+    cout << "{ ";
+    for (optional<int> num: nums) 
+        if(num.has_value()) cout << num.value() << " "; 
+        else cout << "null ";
     cout << "}\n";
 }
