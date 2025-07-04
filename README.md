@@ -52,7 +52,7 @@ int main() {
     Set s2(10);
     s2.add(3);
     s2.add(4);
-    //or s1.addAll({10,3,4});
+    //or s1.addAll({3,4});
 
     Set intersection = s1 & s2;
     Set unionSet = s1 + s2;
