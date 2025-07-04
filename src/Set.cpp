@@ -33,7 +33,7 @@ Hash Set::hash(int num) {
 }
 
 bool Set::contains(int num) { 
-    if (size < 1) return false;
+    if (cur_size < 1) return false;
     return hash(num).contains;
  }
 
@@ -48,7 +48,6 @@ void Set::add(int num) {
 void Set::addAll(vector<int> values) {
     for (int num: values) add(num);
 }
-
 
 void Set::remove(int num) {
     Hash h = hash(num);

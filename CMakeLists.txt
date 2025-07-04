@@ -7,6 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add executable target from source files
 add_executable(MySetProject
-    src/main.cpp
+    src/test.cpp
     src/Set.cpp
 )

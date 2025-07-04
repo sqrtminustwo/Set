@@ -12,7 +12,7 @@ This project implements a basic integer `Set` with operations like:
 - Containment checks
 - Printing
 
-The set uses a simple hash table with linear probing. Test cases are available in main.cpp.
+The set uses a simple hash table with linear probing. Test cases are available in test.cpp.
 
 ---
 
